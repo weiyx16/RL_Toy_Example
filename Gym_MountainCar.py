@@ -1,76 +1,98 @@
 """
-Policy Gradient, Reinforcement Learning.
+Environment for MountainCar-V0 from gym
+Src: https://github.com/openai/gym/blob/master/gym/envs/classic_control/mountain_car.py
 
-The cart pole example
+Requirement:
+Tensorflow: 2.0
+gym: 0.15.4
 
-View more on my tutorial page: https://morvanzhou.github.io/tutorials/
-
-Using:
-Tensorflow: 1.0
-gym: 0.8.0
+https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow
 """
 
 import gym
-from RL_brain import PolicyGradient
+import numpy as np
+from Q_learning import QLearningTable
 import matplotlib.pyplot as plt
 
-DISPLAY_REWARD_THRESHOLD = -2000  # renders environment if total episode reward is greater then this threshold
-# episode: 154   reward: -10667
-# episode: 387   reward: -2009
-# episode: 489   reward: -1006
-# episode: 628   reward: -502
+def state_discrete(state):
+    # discrete position with 0.1 and velocity with 0.01 and rescale to positive
+    # -> state_space (19, 15)
+    # ref: https://towardsdatascience.com/getting-started-with-reinforcement-learning-and-open-ai-gym-c289aca874f
+    state_adj = (state - env.observation_space.low)*np.array([10, 100])
+    state_adj = np.round(state_adj, 0).astype(int)
+    return state_adj
 
-RENDER = False  # rendering wastes time
+def my_reward(next_state, done, reward, iepoch_max_atti):
+    """
+        ref: https://medium.com/@ts1829/solving-mountain-car-with-q-learning-b77bf71b1de2
+        src reward is -1 in all set.
+    """
+    if next_state[0] > iepoch_max_atti:
+        reward += 11
+    # if done:
+    #     reward += 2
+    return reward
 
+## Environment
+RENDER = False  # Show GUI
 env = gym.make('MountainCar-v0')
-env.seed(1)     # reproducible, general Policy gradient has high variance
-env = env.unwrapped
+env.seed(1)     # reproducible
+env = env.unwrapped  # remove the 200 time step limit the cart pole example defaults to
 
-print(env.action_space)
-print(env.observation_space)
-print(env.observation_space.high)
-print(env.observation_space.low)
+print('-'*30+'\r\nAction Space: {}\r\n'.format(env.action_space)) # spaces.Discrete(3)
+print('-'*30+'\r\nObservation Space: {}\r\n'.format(env.observation_space)) 
+# self.state = (position, velocity) range:[-1.2,-0.07]~[0.6,0.07]
 
-RL = PolicyGradient(
-    n_actions=env.action_space.n,
-    n_features=env.observation_space.shape[0],
-    learning_rate=0.02,
-    reward_decay=0.995,
-    # output_graph=True,
+## Agent
+Agent = QLearningTable(
+    actions=np.arange(env.action_space.n), # 3
+    states=state_discrete(env.observation_space.high) + 1,
+    learning_rate=0.2,
+    gamma=0.9,
+    epsilon=1,
+    begin_epsilon=0.2
 )
 
-for i_episode in range(1000):
+## Training
+epoch = 5000
+log_frequency = 100
+episode_rewards = []
+episode_attitude = []
+for iepoch in range(epoch):
 
-    observation = env.reset()
+    cur_state = state_discrete(env.reset())
 
-    while True:
+    action_count, sum_reward, iepoch_max_atti = 0, 0.0, env.observation_space.low[0]
+
+    done = False
+    while not done:
         if RENDER: env.render()
 
-        action = RL.choose_action(observation)
+        action = Agent.choose_action(cur_state, iepoch/epoch)
 
-        observation_, reward, done, info = env.step(action)     # reward = -1 in all cases
+        next_state, reward, done, _ = env.step(action)
+        iepoch_max_atti = max(iepoch_max_atti, next_state[0])
+        action_count += 1
+        sum_reward += reward
 
-        RL.store_transition(observation, action, reward)
+        if done and next_state[0] >= 0.5:  # in case of done when iter reach 200
+            Agent.learn(cur_state, action, my_reward(next_state, done, reward, iepoch_max_atti), 'done')  
+            next_state = state_discrete(next_state)
+        else:
+            Agent.learn(cur_state, action, my_reward(next_state, done, reward, iepoch_max_atti), state_discrete(next_state))
+            next_state = state_discrete(next_state)
+            cur_state = next_state
+    
+    episode_rewards.append(sum_reward)
+    episode_attitude.append(iepoch_max_atti)
+    # if (iepoch+1) % log_frequency == 0:
+    print("episode:", iepoch, " action tried:", int(action_count), " Heighest:",iepoch_max_atti, " average reward to now:",np.mean(episode_rewards))
 
-        if done:
-            # calculate running reward
-            ep_rs_sum = sum(RL.ep_rs)
-            if 'running_reward' not in globals():
-                running_reward = ep_rs_sum
-            else:
-                running_reward = running_reward * 0.99 + ep_rs_sum * 0.01
-            if running_reward > DISPLAY_REWARD_THRESHOLD: RENDER = True     # rendering
-
-            print("episode:", i_episode, "  reward:", int(running_reward))
-
-            vt = RL.learn()  # train
-
-            if i_episode == 30:
-                plt.plot(vt)  # plot the episode vt
-                plt.xlabel('episode steps')
-                plt.ylabel('normalized state-action value')
-                plt.show()
-
-            break
-
-        observation = observation_
+env.close()
+plt.plot(episode_rewards)
+plt.plot(episode_attitude)
+plt.xlabel('Episodes')
+plt.ylabel('Average Reward')
+plt.title('Average Reward vs Episodes')
+plt.savefig('./img/QTable_Reward_Supervised.png')
+plt.close()
