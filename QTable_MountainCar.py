@@ -11,7 +11,7 @@ https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow
 
 import gym
 import numpy as np
-from Q_learning import QLearningTable
+from QTable import QLearningTable
 import matplotlib.pyplot as plt
 
 def state_discrete(state):
@@ -90,7 +90,6 @@ for iepoch in range(epoch):
 
 env.close()
 plt.plot(episode_rewards)
-plt.plot(episode_attitude)
 plt.xlabel('Episodes')
 plt.ylabel('Average Reward')
 plt.title('Average Reward vs Episodes')
