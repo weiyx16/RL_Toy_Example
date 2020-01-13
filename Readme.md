@@ -16,8 +16,8 @@
 
 ## Schedule
 
-- [ ] DQN on task 1
+- [ ] DQN on task 1 in leadboard
 - [ ] Using another ways to present the **state**, like tile coding in leadboard (and finetune the params)
-- [ ] Complish a Qlearning version of Task 1 in leadboard
 - [ ] Maybe you need to replot graph in QTable
-- [ ] Task 2
+- [x] Task 2 A2C
+- [ ] Task 2 DDPG
