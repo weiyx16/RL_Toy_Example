@@ -28,7 +28,10 @@ Need better params
 
 ### A3C
 Need better params
-+ unwarpped: no 999 iter constrain
++ scratch: no 999 iter constrain with state_normalize, without entropy_beta=0.01 (if with entropy then ... no work)  
++ 999(equal to A3C.png): 999 iter constrain with state_normalize, with entropy_beta=0.01  
++ 999_no_norm: 999 iter constrain without state_normalize, with entropy_beta=0.01 
++ no_e: same to 999, without entropy_beta 
 
 
 ## Schedule

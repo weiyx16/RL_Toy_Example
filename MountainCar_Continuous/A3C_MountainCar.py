@@ -38,12 +38,11 @@ n_features_action = env.action_space.shape[0]
 ## Training
 num_workers = multiprocessing.cpu_count()
 epoch_global = 50 * num_workers
-max_iter_per_epoch = 2000
 print('-'*30+'\r\nTraining A3C with worker: {}\r\n'.format(num_workers))
 global_scope_name = 'Global_Net'
 # sets how often the global network should be updated
 update_global = 10
-gamma = 0.9
+gamma = 0.99
 # entropy factor
 entropy_beta = 0.01 
 lr_actor = 1e-4
@@ -117,20 +116,20 @@ class A3C(object):
         """
             Main Struture of Actor-Critic
         """
-        actor_n_hidden1 = 200
-        actor_n_hidden2 = 200
-        critic_n_hidden1 = 100
-        critic_n_hidden2 = 100
-        init_xavier = tf.random_normal_initializer(0., .1) #tf.contrib.layers.xavier_initializer()
+        actor_n_hidden1 = 64
+        actor_n_hidden2 = 128
+        critic_n_hidden1 = 32
+        critic_n_hidden2 = 64
+        init_xavier = tf.contrib.layers.xavier_initializer()
         with tf.variable_scope("Actor"):
             hidden1_actor = tf.layers.dense(inputs=self.cur_s, units=actor_n_hidden1, activation=tf.nn.relu6, kernel_initializer=init_xavier, name="Actor_l1")
-            # hidden2_actor = tf.layers.dense(inputs=hidden1_actor, units=actor_n_hidden2, activation=tf.nn.elu, kernel_initializer=init_xavier, name="Actor_l2") 
-            mu = tf.layers.dense(inputs=hidden1_actor, units=n_features_action, activation=tf.nn.tanh, kernel_initializer=init_xavier, name="Actor_mu")  #tf.nn.tanh
-            sigma = tf.layers.dense(inputs=hidden1_actor, units=n_features_action, activation=tf.nn.softplus, kernel_initializer=init_xavier, name="Actor_sigma")
+            hidden2_actor = tf.layers.dense(inputs=hidden1_actor, units=actor_n_hidden2, activation=tf.nn.elu, kernel_initializer=init_xavier, name="Actor_l2") 
+            mu = tf.layers.dense(inputs=hidden2_actor, units=n_features_action, activation=tf.nn.tanh, kernel_initializer=init_xavier, name="Actor_mu")  #tf.nn.tanh
+            sigma = tf.layers.dense(inputs=hidden2_actor, units=n_features_action, activation=tf.nn.softplus, kernel_initializer=init_xavier, name="Actor_sigma")
         with tf.variable_scope("Critic"):
             hidden1_critic = tf.layers.dense(inputs=self.cur_s, units=critic_n_hidden1, activation=tf.nn.relu6, kernel_initializer=init_xavier, name="Critic_l1")
-            # hidden2_critic = tf.layers.dense(inputs=hidden1_critic, units=critic_n_hidden2, activation=tf.nn.elu, kernel_initializer=init_xavier, name="Critic_l2") 
-            state2value = tf.layers.dense(inputs=hidden1_critic, units=1, activation=None, kernel_initializer=init_xavier, name="Critic_V")
+            hidden2_critic = tf.layers.dense(inputs=hidden1_critic, units=critic_n_hidden2, activation=tf.nn.elu, kernel_initializer=init_xavier, name="Critic_l2") 
+            state2value = tf.layers.dense(inputs=hidden2_critic, units=1, activation=None, kernel_initializer=init_xavier, name="Critic_V")
         a_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope_name + '/Actor')
         c_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope_name + '/Critic')
         return mu, sigma, state2value, a_params, c_params
@@ -148,7 +147,7 @@ class A3C(object):
 class Worker(object):
     def __init__(self, local_scope_name, sess, globalAC):
         # intialize environment for each worker
-        self.env = gym.make('MountainCarContinuous-v0').unwrapped 
+        self.env = gym.make('MountainCarContinuous-v0')#.unwrapped 
         self.local_scope_name = local_scope_name
         
         # create A3C agent for each worker
@@ -157,13 +156,12 @@ class Worker(object):
         self.sess = sess
     
     def state_normalize(self, state):
-        return np.reshape(state,(1,2))
-        # state = np.reshape(state,(1,2))
-        # low_s, high_s = state_range
-        # var_i = np.power((high_s - low_s), 2) / 12
-        # mean_i = (high_s + low_s) / 2
-        # state = (state - mean_i) / var_i
-        # return state
+        state = np.reshape(state,(1,2))
+        low_s, high_s = state_range
+        var_i = np.power((high_s - low_s), 2) / 12
+        mean_i = (high_s + low_s) / 2
+        state = (state - mean_i) / var_i
+        return state
 
     def work(self):
         global global_rewards, global_episodes
@@ -186,8 +184,6 @@ class Worker(object):
                 action_count += 1 
                 cur_action = self.AC.choose_action(cur_state)
                 next_state, reward, done, _ = self.env.step(cur_action)
-                
-                done = True if action_count == max_iter_per_epoch else done
 
                 next_state = self.state_normalize(next_state)
 
@@ -267,5 +263,5 @@ if __name__ == "__main__":
     plt.xlabel('Episodes')
     plt.ylabel('Average Reward')
     plt.title('Average Reward vs Episodes')
-    plt.savefig('./img/AC_unwarpped.png')
+    plt.savefig('./img/A3C.png')
     plt.close()
