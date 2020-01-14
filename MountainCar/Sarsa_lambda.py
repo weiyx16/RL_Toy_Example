@@ -33,11 +33,13 @@ class Sarsalambda(object):
         q_predict = self.Q[cur_s[0], cur_s[1], cur_a]
         if next_s is not 'done':
             delta = r + self.gamma * self.Q[next_s[0],next_s[1], next_a] - q_predict
+            self.E[cur_s[0], cur_s[1], :] *= 0
             self.E[cur_s[0], cur_s[1], cur_a] = 1
             self.Q += self.lr*delta*self.E
             self.E = self.gamma*self.slambda*self.E
         else:
             delta = r - q_predict
+            self.E[cur_s[0], cur_s[1], :] *= 0
             self.E[cur_s[0], cur_s[1], cur_a] = 1
             self.Q += self.lr*delta*self.E
             self.E = np.zeros_like(self.E)

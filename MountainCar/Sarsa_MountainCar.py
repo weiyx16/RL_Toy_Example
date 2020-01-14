@@ -1,12 +1,11 @@
 """
 Environment for MountainCar-V0 from gym
 Src: https://github.com/openai/gym/blob/master/gym/envs/classic_control/mountain_car.py
+Ref: https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow
 
 Requirement:
-Tensorflow: 2.0
+Tensorflow: 1.12.0
 gym: 0.15.4
-
-https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow
 """
 
 import gym
@@ -37,7 +36,7 @@ def my_reward(next_state, done, reward, iepoch_max_atti):
 RENDER = False  # Show GUI
 env = gym.make('MountainCar-v0')
 env.seed(1)     # reproducible
-env = env.unwrapped  # remove the 200 time step limit the cart pole example defaults to
+# env = env.unwrapped  # remove the 200 time step limit the cart pole example defaults to
 
 print('-'*30+'\r\nAction Space: {}\r\n'.format(env.action_space)) # spaces.Discrete(3)
 print('-'*30+'\r\nObservation Space: {}\r\n'.format(env.observation_space)) 
@@ -98,5 +97,5 @@ plt.plot(episode_rewards)
 plt.xlabel('Episodes')
 plt.ylabel('Average Reward')
 plt.title('Average Reward vs Episodes')
-plt.savefig('./img/Sarsa_Stratch.png')
+plt.savefig('./img/Sarsa_200.png')
 plt.close()

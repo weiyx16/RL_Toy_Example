@@ -34,16 +34,3 @@ class QLearningTable:
         else:
             # next state is terminal q_target = r  
             self.Q[cur_s[0],cur_s[1], a] = r
-
-    # def check_state_exist(self, state):
-    #     if list(state) not in self.all_states:
-    #         # append new state to q table
-    #         self.q_table = self.q_table.append(
-    #             pd.Series(
-    #                 np.random.uniform(low = -1, high = 1, 
-    #                       size = (len(self.actions))),
-    #                 index=self.q_table.columns,
-    #                 name='+'.join([str(s_i) for s_i in state]),
-    #             )
-    #         )
-    #         self.all_states.append(list(state))

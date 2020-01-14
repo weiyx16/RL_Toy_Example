@@ -1,12 +1,11 @@
 """
 Environment for MountainCar-V0 from gym
 Src: https://github.com/openai/gym/blob/master/gym/envs/classic_control/mountain_car.py
+Ref: https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow
 
 Requirement:
-Tensorflow: 2.0
+Tensorflow: 1.12.0
 gym: 0.15.4
-
-https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow
 """
 
 import gym

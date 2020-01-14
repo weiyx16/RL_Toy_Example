@@ -20,7 +20,7 @@ import shutil
 import matplotlib.pyplot as plt
 
 GAME = 'Pendulum-v0'
-OUTPUT_GRAPH = True
+OUTPUT_GRAPH = False
 LOG_DIR = './log'
 N_WORKERS = multiprocessing.cpu_count()
 MAX_EP_STEP = 200
