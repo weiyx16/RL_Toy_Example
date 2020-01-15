@@ -13,6 +13,10 @@ import numpy as np
 from Sarsa_lambda import Sarsalambda
 import matplotlib.pyplot as plt
 
+
+RENDER = False  # Show GUI
+
+
 def state_discrete(state):
     # discrete position with 0.1 and velocity with 0.01 and rescale to positive
     # -> state_space (19, 15)
@@ -33,7 +37,6 @@ def my_reward(next_state, done, reward, iepoch_max_atti):
     return reward
 
 ## Environment
-RENDER = False  # Show GUI
 env = gym.make('MountainCar-v0')
 env.seed(1)     # reproducible
 # env = env.unwrapped  # remove the 200 time step limit the cart pole example defaults to

@@ -13,6 +13,10 @@ import numpy as np
 from Sarsa import Sarsa
 import matplotlib.pyplot as plt
 
+
+RENDER = False  # Show GUI
+
+
 def state_discrete(state):
     # discrete position with 0.1 and velocity with 0.01 and rescale to positive
     # -> state_space (19, 15)
@@ -28,12 +32,11 @@ def my_reward(next_state, done, reward, iepoch_max_atti):
     """
     # if next_state[0] > iepoch_max_atti:
     #     reward += 11
-    # if done:
+    # if done and next_state[0] > 0.5:
     #     reward += 2
     return reward
 
 ## Environment
-RENDER = False  # Show GUI
 env = gym.make('MountainCar-v0')
 env.seed(1)     # reproducible
 # env = env.unwrapped  # remove the 200 time step limit the cart pole example defaults to
@@ -97,5 +100,5 @@ plt.plot(episode_rewards)
 plt.xlabel('Episodes')
 plt.ylabel('Average Reward')
 plt.title('Average Reward vs Episodes')
-plt.savefig('./img/Sarsa_200.png')
+plt.savefig('./img/Sarsa.png')
 plt.close()

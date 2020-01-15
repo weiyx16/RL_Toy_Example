@@ -6,11 +6,9 @@ Ref: https://towardsdatascience.com/reinforcement-learning-w-keras-openai-dqns-1
 Requirement:
 Tensorflow: 1.12.0
 gym: 0.15.4
-TODO:
 """
 import gym
 import numpy as np
-from tqdm import tqdm
 import random
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -91,7 +89,6 @@ class DeepQNetwork:
         # s = np.reshape(s,(2,))
         
         transition = np.hstack((s, [a, r], s_, dones))
-        # replace the old memory with new memory
         index = self.memory_counter % self.memory_size
         self.memory[index, :] = transition
         self.memory_counter += 1
@@ -99,15 +96,13 @@ class DeepQNetwork:
     def update_t_q(self):
         self.sess.run(self.hard_replace_op)
 
-    def choose_action(self, observation, epsilon_decay=False):
+    def choose_action(self, cur_s, epsilon_decay=False):
         if epsilon_decay:
             self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
-        # to have batch dimension when feed into tf placeholder
-        observation = observation[np.newaxis, :]
+        cur_s = cur_s[np.newaxis,:]
 
         if np.random.uniform() > self.epsilon:
-            # forward feed the observation and get q value for every actions
-            actions_value = self.sess.run(self.q_eval, feed_dict={self.cur_s: observation})
+            actions_value = self.sess.run(self.q_eval, feed_dict={self.cur_s: cur_s})
             action = np.argmax(actions_value)
         else:
             action = np.random.randint(0, self.n_actions)
@@ -116,7 +111,6 @@ class DeepQNetwork:
     def optimize(self):
 
         self.sess.run(self.soft_replace_op)
-        # sample batch memory from all memory
         if self.memory_counter > self.memory_size:
             sample_index = np.random.choice(self.memory_size, size=self.batch_size)
         else:
@@ -175,7 +169,7 @@ if __name__ == "__main__":
     iter_over_epoch = 0
     episode_rewards = []
     episode_attitude = []
-    for iepoch in tqdm(range(epoch), ncols=70):
+    for iepoch in range(epoch):
 
         cur_state = state_normalize(env.reset(), state_range)
         action_count, sum_reward, iepoch_max_atti = 0, 0.0, env.observation_space.low[0]
@@ -215,5 +209,5 @@ if __name__ == "__main__":
     plt.xlabel('Episodes')
     plt.ylabel('Average Reward')
     plt.title('Average Reward vs Episodes')
-    plt.savefig('./img/DQN_reward_warp_200.png')
+    plt.savefig('./img/DQN.png')
     plt.close()

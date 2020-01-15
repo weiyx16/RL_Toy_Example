@@ -11,8 +11,6 @@ gym: 0.15.4
 
 import gym
 import numpy as np
-# from .A2C import Actor, Critic
-from tqdm import tqdm
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import warnings
@@ -149,7 +147,7 @@ if __name__ == "__main__":
     epoch = 300
     episode_rewards = []
     episode_attitude = []
-    for iepoch in tqdm(range(epoch), ncols=70):
+    for iepoch in range(epoch):
 
         cur_state = state_normalize(env.reset(), state_range)
         action_count, sum_reward, iepoch_max_atti = 0, 0.0, env.observation_space.low[0]
