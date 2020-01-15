@@ -7,7 +7,6 @@ ref: https://morvanzhou.github.io/tutorials/machine-learning/reinforcement-learn
 Requirement:
 Tensorflow: 1.12.0
 gym: 0.15.4
-TODO:
 """
 
 import gym
@@ -21,9 +20,12 @@ import shutil
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+
+RENDER = False  # Show GUI
+
+
 # HyperParameters:
 ## Environment
-RENDER = False  # Show GUI
 env = gym.make('MountainCarContinuous-v0')
 # env.seed(1)     # reproducible
 # env = env.unwrapped  # remove the 200 time step limit the cart pole example defaults to

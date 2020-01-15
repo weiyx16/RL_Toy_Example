@@ -11,15 +11,21 @@ Env from [gym](https://github.com/openai/gym) and compare different methods on t
 + Matplotlib (test on 3.1.1)
 
 ```sh
-# or you can directly run: if you use anaconda
+# or if you use anaconda, you can directly run: 
 $ conda env create -f environment.yml
 ```
 
-## Mountain Car v0
+## Usage
 
-Result: DQN>Sarsa-lambda>Sarsa~QTable  
+**Notice** if you want to render the video, in beginning of each file:
+```python
+RENDER = True  # Show GUI
+```
 
-### Usage
+### Mountain Car v0
+
+Result: DQN>Sarsa-lambda>Sarsa~QTable 
+
 ```sh
 $ cd MountainCar
 # Run QTable
@@ -32,15 +38,34 @@ $ python Sarsalambda_MountainCar.py
 $ python DQN_MountainCar.py
 ```
 
-## Continuous Mountain Car v0
+### Continuous Mountain Car v0
 
-### A2C
-+ 999: state_normalize in 999 iter
-+ with_e: state_normalize with self.norm_dist.entropy() 
+Result: A2C>A3C
 
-### A3C
-Need better params
-+ scratch: no 999 iter constrain with state_normalize, without entropy_beta=0.01 (if with entropy then ... no work)  
-+ 999(equal to A3C.png): 999 iter constrain with state_normalize, with entropy_beta=0.01  
-+ 999_no_norm: 999 iter constrain without state_normalize, with entropy_beta=0.01 
-+ no_e: same to 999, without entropy_beta 
+```sh
+$ cd MountainCar_Continuous
+# Run A2C
+$ python A2C_MountainCar.py
+# Run A3C
+$ python A3C_MountainCar.py
+```
+
+## Citation
+
+```bibtex
+@misc{RLYixuan2020, 
+    author = {Yixuan, Wei},
+    title = {Mountain car RL task},
+    howpublished = {\url{https://github.com/weiyx16/RL_Toy_Example}},
+    year = {2020}
+}
+```
+
+## Thanks
+
++ https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow  
++ https://towardsdatascience.com/reinforcement-learning-w-keras-openai-dqns-1eed3a5338c  
++ https://github.com/stefanbo92/A3C-Continuous  
++ https://github.com/sudharsan13296/Hands-On-Reinforcement-Learning-With-Python  
++ https://medium.com/@asteinbach/actor-critic-using-deep-rl-continuous-mountain-car-in-tensorflow-4c1fb2110f7c  
++ https://towardsdatascience.com/understanding-actor-critic-methods-931b97b6df3f  

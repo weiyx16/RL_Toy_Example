@@ -16,6 +16,10 @@ import tensorflow as tf
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+
+RENDER = False  # Show GUI
+
+
 class Actor(object):
     """
         Policy part to sample action
@@ -126,7 +130,6 @@ def state_normalize(state, state_range):
 
 if __name__ == "__main__":
     ## Environment
-    RENDER = False  # Show GUI
     env = gym.make('MountainCarContinuous-v0')
     # env.seed(1)     # reproducible
     # env = env.unwrapped  # remove the 200 time step limit the cart pole example defaults to
@@ -188,5 +191,5 @@ if __name__ == "__main__":
     plt.xlabel('Episodes')
     plt.ylabel('Average Reward')
     plt.title('Average Reward vs Episodes')
-    plt.savefig('./img/ACA_999.png')
+    plt.savefig('./img/A2C.png')
     plt.close()
